@@ -7,6 +7,15 @@ import us.codecraft.xsoup.Xsoup
 
 class Novel(private val client: EsjzoneClient, val id: String, val name: String) {
 
+    var cover: String? = null
+        private set
+        get() {
+            if (field == null) {
+                val desc = this.description
+            }
+            return field
+        }
+
     var description: NovelDescription? = null
         private set
         get() {
@@ -27,6 +36,10 @@ class Novel(private val client: EsjzoneClient, val id: String, val name: String)
                     }
                     rawList.add(TextDescriptionLine(element.text(), false))
                 }
+                var cover = Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/div[1]/div[1]/a/img/@src").list().getOrNull(0)
+                if (cover == null)
+                    cover = ""
+                this.cover = cover
                 field = NovelDescription(rawList.toImmutableList())
             }
             return field
