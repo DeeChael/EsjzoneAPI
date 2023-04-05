@@ -5,6 +5,13 @@ import net.deechael.esjzone.chapter.Chapter
 import okhttp3.internal.toImmutableList
 import us.codecraft.xsoup.Xsoup
 
+/**
+ * 小说
+ *
+ * @param client Esjzone客户端
+ * @param id 小说id
+ * @param name 小说名称
+ */
 class Novel(private val client: EsjzoneClient, val id: String, val name: String) {
 
     var cover: String? = null
@@ -45,6 +52,10 @@ class Novel(private val client: EsjzoneClient, val id: String, val name: String)
             return field
         }
 
+    /**
+     * 列出该小说的所有章节
+     * @return 该小说的所有章节
+     */
     fun listChapters(): List<Chapter> {
         val chapters = mutableListOf<Chapter>()
         val document = this.client.service.getNovelDetail(this.id).execute().body()!!

@@ -5,8 +5,19 @@ import net.deechael.esjzone.novel.Novel
 import okhttp3.internal.toImmutableList
 import us.codecraft.xsoup.Xsoup
 
+/**
+ * 小说分类
+ *
+ * @param client Esjzone客户端
+ * @param id 分类id
+ * @param name 分类名称
+ */
 class Category(val client: EsjzoneClient, val id: String, val name: String) {
 
+    /**
+     * 列出分类下的所有小说
+     * @return 该分类下所有小说
+     */
     fun listNovels(): List<Novel> {
         val novels = mutableListOf<Novel>()
         val document = this.client.service.getCategoryNovels(this.id).execute().body()!!

@@ -5,6 +5,14 @@ import net.deechael.esjzone.novel.Novel
 import okhttp3.internal.toImmutableList
 import us.codecraft.xsoup.Xsoup
 
+/**
+ * 小说章节
+ *
+ * @param client Esjzone客户端
+ * @param novel 章节所属小说
+ * @param id 章节id
+ * @param name 章节名称
+ */
 class Chapter(private val client: EsjzoneClient, val novel: Novel, val id: String, val name: String) {
 
     var contents: List<ChapterContent>? = null
