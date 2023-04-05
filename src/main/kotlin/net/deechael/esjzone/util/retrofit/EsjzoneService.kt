@@ -59,4 +59,10 @@ interface EsjzoneService {
     @GET("forum/{bookId}/{chapterId}.html")
     fun getChapterDetail(@Path("bookId") bookId: String, @Path("chapterId") chapterId: String): Call<Document>
 
+    @GET("forum")
+    fun getCategories(): Call<Document>
+
+    @GET("forum/{categoryId}/")
+    fun getCategoryNovels(@Path("categoryId") categoryId: String): Call<Document>
+
 }

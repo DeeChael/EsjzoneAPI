@@ -1,10 +1,13 @@
 package net.deechael.esjzone
 
+import net.deechael.esjzone.category.Category
 import net.deechael.esjzone.util.retrofit.DocumentFactory
 import net.deechael.esjzone.util.retrofit.EsjzoneService
 import net.deechael.esjzone.user.User
 import okhttp3.*
+import okhttp3.internal.toImmutableList
 import retrofit2.Retrofit
+import us.codecraft.xsoup.Xsoup
 import java.net.InetSocketAddress
 import java.net.Proxy
 
@@ -42,6 +45,16 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
 
     fun getUserInfo(uid: Int): User {
         return User(this, this.service.getUserProfile(uid).execute().body()!!)
+    }
+
+    fun getCategories(): List<Category> {
+        val categories = mutableListOf<Category>()
+        val document = this.service.getCategories().execute().body()!!
+        for (element in Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/table/tbody/tr/td/a").elements) {
+            val rawUrl = element.attr("href")
+            categories.add(Category(this, rawUrl.substring(7, rawUrl.length - 1), element.text()))
+        }
+        return categories.toImmutableList()
     }
 
 }
