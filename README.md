@@ -20,18 +20,49 @@ Xsoup\
 Gson
 
 ## 快速入门
-```java
+```kotlin
 // 登录方法 1 - Cookie 缓存
-EsjzoneClient client = EsjzoneClientBuilder.of()
+val client: EsjzoneClient = EsjzoneClientBuilder.of()
         .key("这里放置你的wsKey")
         .token("这里放置你的wsToken")
-        .build();
+        .build()
 // 登录方法 2 - 账户 + 密码
-EsjzoneClient client = EsjzoneLoginer.of()
-        .login("123456@deechael.net", "password123");
+val client: EsjzoneClient = EsjzoneLoginer.of()
+        .login("123456@deechael.net", "password123")
 ```
 获取用户信息
+```kotlin
+val uid: Int = 12345
+val user: User = client.getUserInfo(uid)
+```
+获取所有的分类，并获取分类下所有的小说
 ```java
-int uid = 12345
-User user = client.getUserInfo(uid);
+val categories: List<Category> = client.getCategories()
+for (category in categories) {
+        val novels: List<Novel> = category.listNovels()
+}
+```
+获取小说的介绍、章节
+```kotlin
+val novel: Novel = ...
+val description: NovelDescription = novel.description
+for (line in description.descriptionLine) {
+    if (line is TextDescriptionLine) {
+        println(line.text)
+    } else if (line is ImageDescriptionLine) {
+        println(line.src)
+    }   
+}
+val chapters: List<Chapter> = novel.listChapters()
+```
+获取小说章节的内容
+```kotlin
+val chapter: Chapter = ...
+for (content in chapter.contents) {
+    if (content is TextChapterContent) {
+        println(content.text)
+    } else if (content is ImageChapterContent) {
+        println(content.url)
+    }
+}
 ```
