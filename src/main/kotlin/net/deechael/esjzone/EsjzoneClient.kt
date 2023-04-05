@@ -47,7 +47,7 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
         return User(this, this.service.getUserProfile(uid).execute().body()!!)
     }
 
-    fun getCategories(): List<Category> {
+    fun listCategories(): List<Category> {
         val categories = mutableListOf<Category>()
         val document = this.service.getCategories().execute().body()!!
         for (element in Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/table/tbody/tr/td/a").elements) {

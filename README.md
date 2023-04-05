@@ -37,7 +37,7 @@ val user: User = client.getUserInfo(uid)
 ```
 获取所有的分类，并获取分类下所有的小说
 ```java
-val categories: List<Category> = client.getCategories()
+val categories: List<Category> = client.listCategories()
 for (category in categories) {
         val novels: List<Novel> = category.listNovels()
 }

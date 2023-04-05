@@ -5,9 +5,10 @@ import net.deechael.esjzone.chapter.Chapter
 import okhttp3.internal.toImmutableList
 import us.codecraft.xsoup.Xsoup
 
-class Novel(internal val client: EsjzoneClient, val id: String, val name: String) {
+class Novel(private val client: EsjzoneClient, val id: String, val name: String) {
 
-    private var description: NovelDescription? = null
+    var description: NovelDescription? = null
+        private set
         get() {
             if (field == null) {
                 val document = this.client.service.getNovelDetail(this.id).execute().body()!!

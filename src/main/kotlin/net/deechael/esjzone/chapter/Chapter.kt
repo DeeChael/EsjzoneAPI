@@ -7,7 +7,8 @@ import us.codecraft.xsoup.Xsoup
 
 class Chapter(private val client: EsjzoneClient, val novel: Novel, val id: String, val name: String) {
 
-    private var contents: List<ChapterContent>? = null
+    var contents: List<ChapterContent>? = null
+        private set
         get() {
             if (field == null)
                 field = listOf()
@@ -17,11 +18,11 @@ class Chapter(private val client: EsjzoneClient, val novel: Novel, val id: Strin
                 for (rawContent in Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[3]")
                     .elements[0].allElements) {
                     if (rawContent.getElementsByTag("br").size > 0) {
-                        chapterContents.add(ChapterBreakLine())
+                        chapterContents.add(BreakLineChapterContent())
                     } else if (rawContent.getElementsByTag("img").size > 0) {
-                        chapterContents.add(ChapterImage(rawContent.getElementsByTag("img")[0].attr("src")))
+                        chapterContents.add(ImageChapterContent(rawContent.getElementsByTag("img")[0].attr("src")))
                     } else {
-                        chapterContents.add(ChapterText(rawContent.text()))
+                        chapterContents.add(TextChapterContent(rawContent.text()))
                     }
                 }
                 field = chapterContents.toImmutableList()
@@ -35,21 +36,15 @@ interface ChapterContent {
 
 }
 
-class ChapterText(content: String) : ChapterContent {
-
-    private val content: String
-
-    init {
-        this.content = content
-    }
+class TextChapterContent(val text: String) : ChapterContent {
 
     override fun toString(): String {
-        return this.content
+        return this.text
     }
 
 }
 
-class ChapterBreakLine : ChapterContent {
+class BreakLineChapterContent : ChapterContent {
 
     override fun toString(): String {
         return "\n"
@@ -57,13 +52,7 @@ class ChapterBreakLine : ChapterContent {
 
 }
 
-class ChapterImage(url: String) : ChapterContent {
-
-    private val url: String
-
-    init {
-        this.url = url
-    }
+class ImageChapterContent(val url: String) : ChapterContent {
 
     override fun toString(): String {
         return this.url
