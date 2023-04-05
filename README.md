@@ -39,7 +39,7 @@ val user: User = client.getUserInfo(uid)
 val me: SelfUser = client.getMe();
 ```
 获取所有的分类，并获取分类下所有的小说
-```java
+```kotlin
 val categories: List<Category> = client.listCategories()
 for (category in categories) {
         val novels: List<Novel> = category.listNovels()
