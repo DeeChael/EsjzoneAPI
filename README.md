@@ -34,6 +34,9 @@ val client: EsjzoneClient = EsjzoneLoginer.of()
 ```kotlin
 val uid: Int = 12345
 val user: User = client.getUserInfo(uid)
+
+// 获取我自己
+val me: SelfUser = client.getMe();
 ```
 获取所有的分类，并获取分类下所有的小说
 ```java

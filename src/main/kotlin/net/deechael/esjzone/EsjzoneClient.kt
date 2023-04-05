@@ -1,6 +1,7 @@
 package net.deechael.esjzone
 
 import net.deechael.esjzone.category.Category
+import net.deechael.esjzone.user.SelfUser
 import net.deechael.esjzone.util.retrofit.DocumentFactory
 import net.deechael.esjzone.util.retrofit.EsjzoneService
 import net.deechael.esjzone.user.User
@@ -45,6 +46,10 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
 
     fun getUserInfo(uid: Int): User {
         return User(this, this.service.getUserProfile(uid).execute().body()!!)
+    }
+
+    fun getMe(): SelfUser {
+        return SelfUser(this, this.service.getMyProfile().execute().body()!!)
     }
 
     fun listCategories(): List<Category> {
