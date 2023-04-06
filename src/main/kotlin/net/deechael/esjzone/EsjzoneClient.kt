@@ -1,6 +1,9 @@
 package net.deechael.esjzone
 
 import net.deechael.esjzone.category.Category
+import net.deechael.esjzone.novel.Novel
+import net.deechael.esjzone.types.Sorts
+import net.deechael.esjzone.types.Types
 import net.deechael.esjzone.user.SelfUser
 import net.deechael.esjzone.util.retrofit.DocumentFactory
 import net.deechael.esjzone.util.retrofit.EsjzoneService
@@ -17,6 +20,8 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
     val httpClient: OkHttpClient
     val retrofit: Retrofit
     val service: EsjzoneService
+
+    private var self: SelfUser? = null
 
     init {
         val builder = OkHttpClient.Builder()
@@ -49,7 +54,9 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
     }
 
     fun getMe(): SelfUser {
-        return SelfUser(this, this.service.getMyProfile().execute().body()!!)
+        if (this.self == null)
+            this.self = SelfUser(this, this.service.getMyProfile().execute().body()!!)
+        return this.self!!
     }
 
     fun listCategories(): List<Category> {
@@ -60,6 +67,30 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
             categories.add(Category(this, rawUrl.substring(7, rawUrl.length - 1), element.text()))
         }
         return categories.toImmutableList()
+    }
+
+    /**
+     * 列出小说
+     * @param type 小说类型
+     * @param sort 筛选方法
+     * @return 获得到的小说列表
+     */
+    fun listNovels(type: Types = Types.ALL, sort: Sorts = Sorts.RECENTLY_UPDATED): List<Novel> {
+        val novels = mutableListOf<Novel>()
+        val document = this.service.getNovelsByTag(type.index, sort.index).execute().body()!!
+        val rawCovers = Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[3]/div/div/a/div/div/div").elements
+        val rawInfos = Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[3]/div/div/div/h5/a").elements
+        for (i in 0 until rawCovers.size) {
+            val rawCoverUrl = rawCovers[i].attr("data-src")
+            val rawUrl = rawInfos[i].attr("href")
+            novels.add(Novel(
+                client = this,
+                id = rawUrl.substring(8, rawUrl.length - 5),
+                name = rawInfos[i].text(),
+                cover = if (rawCoverUrl.startsWith("/assets")) "https://www.esjzone.cc$rawCoverUrl" else rawCoverUrl
+            ))
+        }
+        return novels.toImmutableList()
     }
 
 }
