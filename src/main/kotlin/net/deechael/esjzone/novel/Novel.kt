@@ -4,6 +4,7 @@ import net.deechael.esjzone.EsjzoneClient
 import net.deechael.esjzone.chapter.Chapter
 import net.deechael.esjzone.comment.Comment
 import net.deechael.esjzone.tag.Tag
+import net.deechael.esjzone.util.retrofit.BodyBuilder
 import okhttp3.internal.toImmutableList
 import us.codecraft.xsoup.Xsoup
 
@@ -125,8 +126,11 @@ class Novel(private val client: EsjzoneClient, val id: String, val name: String,
     }
 
     fun comment(content: String) {
-        this.client.service.getAuthToken("detail/${this.id}.html")
-        this.client.service.createComment(content)
+        this.client.getAuthToken("detail/${this.id}.html")
+        this.client.service.createComment(BodyBuilder.of()
+            .param("content", content)
+            .param("data", "books")
+            .build())
     }
 
     fun listComments(): List<Comment> {

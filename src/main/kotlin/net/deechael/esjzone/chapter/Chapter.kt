@@ -3,6 +3,7 @@ package net.deechael.esjzone.chapter
 import net.deechael.esjzone.EsjzoneClient
 import net.deechael.esjzone.comment.Comment
 import net.deechael.esjzone.novel.Novel
+import net.deechael.esjzone.util.retrofit.BodyBuilder
 import okhttp3.internal.toImmutableList
 import us.codecraft.xsoup.Xsoup
 
@@ -42,8 +43,12 @@ class Chapter(private val client: EsjzoneClient, val novel: Novel, val id: Strin
         }
 
     fun comment(content: String) {
-        this.client.service.getAuthToken("forum/${novel.id}/${this.id}.html")
-        this.client.service.createChapterComment(content, this.id)
+        this.client.getAuthToken("forum/${novel.id}/${this.id}.html")
+        this.client.service.createComment(BodyBuilder.of()
+            .param("content", content)
+            .param("forum_id", this.id)
+            .param("data", "forum")
+            .build())
     }
 
     fun listComments(): List<Comment> {

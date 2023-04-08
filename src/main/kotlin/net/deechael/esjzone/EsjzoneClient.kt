@@ -8,6 +8,7 @@ import net.deechael.esjzone.user.SelfUser
 import net.deechael.esjzone.util.retrofit.DocumentFactory
 import net.deechael.esjzone.util.retrofit.EsjzoneService
 import net.deechael.esjzone.user.User
+import net.deechael.esjzone.util.retrofit.BodyBuilder
 import okhttp3.*
 import okhttp3.internal.toImmutableList
 import retrofit2.Retrofit
@@ -47,6 +48,10 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
             .addConverterFactory(DocumentFactory())
             .build()
         this.service = this.retrofit.create(EsjzoneService::class.java)
+    }
+
+    fun getAuthToken(url: String) {
+        this.service.getAuthToken(url, BodyBuilder.of().param("plxf", "getAuthToken").build())
     }
 
     fun getUserInfo(uid: Int): User {
