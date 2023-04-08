@@ -5,10 +5,10 @@ import net.deechael.esjzone.novel.Novel
 import net.deechael.esjzone.types.Sorts
 import net.deechael.esjzone.types.Types
 import net.deechael.esjzone.user.SelfUser
-import net.deechael.esjzone.util.retrofit.DocumentFactory
-import net.deechael.esjzone.util.retrofit.EsjzoneService
 import net.deechael.esjzone.user.User
 import net.deechael.esjzone.util.retrofit.BodyBuilder
+import net.deechael.esjzone.util.retrofit.DocumentFactory
+import net.deechael.esjzone.util.retrofit.EsjzoneService
 import okhttp3.*
 import okhttp3.internal.toImmutableList
 import retrofit2.Retrofit
@@ -50,8 +50,12 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
         this.service = this.retrofit.create(EsjzoneService::class.java)
     }
 
-    fun getAuthToken(url: String) {
-        this.service.getAuthToken(url, BodyBuilder.of().param("plxf", "getAuthToken").build())
+    fun getAuthToken(url: String): String {
+        val response = this.service.getAuthToken(url, BodyBuilder.of().param("plxf", "getAuthToken").build()).execute()
+        val document = response.body()!!
+        val text = document.getElementsByTag("JinJing")[0].text()
+        println(text)
+        return text
     }
 
     fun getUserInfo(uid: Int): User {
@@ -67,7 +71,10 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
     fun listCategories(): List<Category> {
         val categories = mutableListOf<Category>()
         val document = this.service.getCategories().execute().body()!!
-        for (element in Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/table/tbody/tr/td/a").elements) {
+        for (element in Xsoup.select(
+            document,
+            "/html/body/div[3]/section/div/div[1]/div[1]/table/tbody/tr/td/a"
+        ).elements) {
             val rawUrl = element.attr("href")
             categories.add(Category(this, rawUrl.substring(7, rawUrl.length - 1), element.text()))
         }
@@ -83,17 +90,20 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
     fun listNovels(type: Types = Types.ALL, sort: Sorts = Sorts.RECENTLY_UPDATED): List<Novel> {
         val novels = mutableListOf<Novel>()
         val document = this.service.getNovelsByTag(type.index, sort.index).execute().body()!!
-        val rawCovers = Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[3]/div/div/a/div/div/div").elements
+        val rawCovers =
+            Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[3]/div/div/a/div/div/div").elements
         val rawInfos = Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[3]/div/div/div/h5/a").elements
         for (i in 0 until rawCovers.size) {
             val rawCoverUrl = rawCovers[i].attr("data-src")
             val rawUrl = rawInfos[i].attr("href")
-            novels.add(Novel(
-                client = this,
-                id = rawUrl.substring(8, rawUrl.length - 5),
-                name = rawInfos[i].text(),
-                cover = if (rawCoverUrl.startsWith("/assets")) "https://www.esjzone.cc$rawCoverUrl" else rawCoverUrl
-            ))
+            novels.add(
+                Novel(
+                    client = this,
+                    id = rawUrl.substring(8, rawUrl.length - 5),
+                    name = rawInfos[i].text(),
+                    cover = if (rawCoverUrl.startsWith("/assets")) "https://www.esjzone.cc$rawCoverUrl" else rawCoverUrl
+                )
+            )
         }
         return novels.toImmutableList()
     }

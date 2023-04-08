@@ -1,7 +1,6 @@
 import com.google.gson.JsonParser
 import net.deechael.esjzone.EsjzoneClient
 import net.deechael.esjzone.EsjzoneClientProxiedBuilder
-import net.deechael.esjzone.comment.MeComment
 import net.deechael.esjzone.novel.Novel
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -32,9 +31,8 @@ class MainTest {
     @Test
     fun test() {
         val novel = Novel(this.client, "1678715616", "")
-        // novel.comment("支持一下！")
-        val comment = MeComment(this.client, novel, null, "1098369", 89573, "")
-        comment.delete()
+        novel.comment("支持一下！")
+        // val comment = MeComment(this.client, novel, null, "1098400", 89573, "")
+        // comment.delete()
     }
-
 }

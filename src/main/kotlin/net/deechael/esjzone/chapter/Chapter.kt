@@ -3,7 +3,6 @@ package net.deechael.esjzone.chapter
 import net.deechael.esjzone.EsjzoneClient
 import net.deechael.esjzone.comment.Comment
 import net.deechael.esjzone.novel.Novel
-import net.deechael.esjzone.util.retrofit.BodyBuilder
 import okhttp3.internal.toImmutableList
 import us.codecraft.xsoup.Xsoup
 
@@ -43,12 +42,16 @@ class Chapter(private val client: EsjzoneClient, val novel: Novel, val id: Strin
         }
 
     fun comment(content: String) {
-        this.client.getAuthToken("forum/${novel.id}/${this.id}.html")
-        this.client.service.createComment(BodyBuilder.of()
-            .param("content", content)
-            .param("forum_id", this.id)
-            .param("data", "forum")
-            .build())
+        // this.client.service.createComment(BodyBuilder.of()
+        //     .param("content", content)
+        //     .param("forum_id", this.id)
+        //     .param("data", "forum")
+        //     .build(), this.client.getAuthToken("forum/${novel.id}/${this.id}.html"))
+        this.client.service.createChapterComment(
+            this.client.getAuthToken("forum/${novel.id}/${this.id}.html"),
+            content,
+            this.id
+        )
     }
 
     fun listComments(): List<Comment> {
@@ -56,17 +59,25 @@ class Chapter(private val client: EsjzoneClient, val novel: Novel, val id: Strin
         val document = this.client.service.getChapterDetail(this.novel.id, this.id).execute().body()!!
         for (commentElement in Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/section/div").elements) {
             val id = commentElement.attr("id").substring(8)
-            val senderId = commentElement.getElementById("comment-author-ava")!!.getElementsByTag("a")[0].attr("href").substring(16).toInt()
-            comments.add(Comment(this.client, this.novel, this, id, senderId, commentElement.getElementById("comment-text ")!!.text()))
+            val senderId = commentElement.getElementById("comment-author-ava")!!.getElementsByTag("a")[0].attr("href")
+                .substring(16).toInt()
+            comments.add(
+                Comment(
+                    this.client,
+                    this.novel,
+                    this,
+                    id,
+                    senderId,
+                    commentElement.getElementById("comment-text ")!!.text()
+                )
+            )
         }
         return comments.toImmutableList()
     }
 
 }
 
-interface ChapterContent {
-
-}
+interface ChapterContent
 
 class TextChapterContent(val text: String) : ChapterContent {
 

@@ -4,7 +4,6 @@ import net.deechael.esjzone.EsjzoneClient
 import net.deechael.esjzone.chapter.Chapter
 import net.deechael.esjzone.comment.Comment
 import net.deechael.esjzone.tag.Tag
-import net.deechael.esjzone.util.retrofit.BodyBuilder
 import okhttp3.internal.toImmutableList
 import us.codecraft.xsoup.Xsoup
 
@@ -67,7 +66,8 @@ class Novel(private val client: EsjzoneClient, val id: String, val name: String,
         get() {
             if (field == null) {
                 val document = this.client.service.getNovelDetail(this.id).execute().body()!!
-                val elements = Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[2]/div/div/div/p").elements
+                val elements =
+                    Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[2]/div/div/div/p").elements
                 val rawList = mutableListOf<DescriptionLine>()
                 for (element in elements) {
                     val strongs = element.getElementsByTag("strong")
@@ -82,20 +82,29 @@ class Novel(private val client: EsjzoneClient, val id: String, val name: String,
                     }
                     rawList.add(TextDescriptionLine(element.text(), false))
                 }
-                var cover = Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/div[1]/div[1]/a/img/@src").list().getOrNull(0)
+                var cover =
+                    Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/div[1]/div[1]/a/img/@src")
+                        .list().getOrNull(0)
                 if (cover == null)
                     cover = ""
                 this.cover = cover
                 if (this.tags == null) {
                     val tags = mutableListOf<Tag>()
-                    for (tag in Xsoup.select(document, "/html/body/div[3]/section/div/div[2]/section/a/text()").list()) {
+                    for (tag in Xsoup.select(document, "/html/body/div[3]/section/div/div[2]/section/a/text()")
+                        .list()) {
                         tags.add(Tag(this.client, tag))
                     }
                     this.tags = tags.toImmutableList()
                 }
-                this.views = Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/div[2]/span/label[1]/span").get().toInt()
-                this.favorites = Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/div[2]/span/label[2]/span").get().toInt()
-                this.words = Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/div[2]/span/label[3]/span").get().replace(",", "").toInt()
+                this.views =
+                    Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/div[2]/span/label[1]/span")
+                        .get().toInt()
+                this.favorites =
+                    Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/div[2]/span/label[2]/span")
+                        .get().toInt()
+                this.words =
+                    Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/div[1]/div[2]/span/label[3]/span")
+                        .get().replace(",", "").toInt()
                 field = NovelDescription(rawList.toImmutableList())
             }
             return field
@@ -112,52 +121,72 @@ class Novel(private val client: EsjzoneClient, val id: String, val name: String,
     fun listChapters(): List<Chapter> {
         val chapters = mutableListOf<Chapter>()
         val document = this.client.service.getNovelDetail(this.id).execute().body()!!
-        val rawDetailedChapters = Xsoup.select(document, "/html/body/div/section/div/div/div/div/div/div/div/detail/a").elements
+        val rawDetailedChapters =
+            Xsoup.select(document, "/html/body/div/section/div/div/div/div/div/div/div/detail/a").elements
         val rawChapters = Xsoup.select(document, "/html/body/div/section/div/div/div/div/div/div/div/a").elements
         for (rawDetailedChapter in rawDetailedChapters) {
             val rawUrl = rawDetailedChapter.attr("href")
-            chapters.add(Chapter(this.client, this, rawUrl.substring("https://www.esjzone.cc/forum/${this.id}/".length, rawUrl.length - 4), rawDetailedChapter.attr("data-title")))
+            chapters.add(
+                Chapter(
+                    this.client,
+                    this,
+                    rawUrl.substring("https://www.esjzone.cc/forum/${this.id}/".length, rawUrl.length - 4),
+                    rawDetailedChapter.attr("data-title")
+                )
+            )
         }
         for (rawChapter in rawChapters) {
             val rawUrl = rawChapter.attr("href")
-            chapters.add(Chapter(this.client, this, rawUrl.substring("https://www.esjzone.cc/forum/${this.id}/".length, rawUrl.length - 4), rawChapter.attr("data-title")))
+            chapters.add(
+                Chapter(
+                    this.client,
+                    this,
+                    rawUrl.substring("https://www.esjzone.cc/forum/${this.id}/".length, rawUrl.length - 4),
+                    rawChapter.attr("data-title")
+                )
+            )
         }
         return chapters.toImmutableList()
     }
 
     fun comment(content: String) {
-        this.client.getAuthToken("detail/${this.id}.html")
-        this.client.service.createComment(BodyBuilder.of()
-            .param("content", content)
-            .param("data", "books")
-            .build())
+        // this.client.service.createComment(BodyBuilder.of()
+        //     .param("content", content)
+        //     .param("data", "books")
+        //     .build(), this.client.getAuthToken("detail/${this.id}.html"))
+        this.client.service.createComment(this.client.getAuthToken("detail/${this.id}.html"), content)
     }
 
     fun listComments(): List<Comment> {
         val comments = mutableListOf<Comment>()
         val document = this.client.service.getNovelDetail(this.id).execute().body()!!
-        for (commentElement in Xsoup.select(document, "/html/body/div[3]/section/div/div[1]/section[39]/div[1]").elements) {
+        for (commentElement in Xsoup.select(
+            document,
+            "/html/body/div[3]/section/div/div[1]/section[39]/div[1]"
+        ).elements) {
             val id = commentElement.attr("id").substring(8)
-            val senderId = commentElement.getElementById("comment-author-ava")!!.getElementsByTag("a")[0].attr("href").substring(16).toInt()
-            comments.add(Comment(this.client, this, null, id, senderId, commentElement.getElementById("comment-text ")!!.text()))
+            val senderId = commentElement.getElementById("comment-author-ava")!!.getElementsByTag("a")[0].attr("href")
+                .substring(16).toInt()
+            comments.add(
+                Comment(
+                    this.client,
+                    this,
+                    null,
+                    id,
+                    senderId,
+                    commentElement.getElementById("comment-text ")!!.text()
+                )
+            )
         }
         return comments.toImmutableList()
     }
 
 }
 
-class NovelDescription(val descriptionLines: List<DescriptionLine>) {
+class NovelDescription(val descriptionLines: List<DescriptionLine>)
 
-}
+interface DescriptionLine
 
-interface DescriptionLine {
+class TextDescriptionLine(val text: String, val strong: Boolean) : DescriptionLine
 
-}
-
-class TextDescriptionLine(val text: String, val strong: Boolean): DescriptionLine {
-
-}
-
-class ImageDescriptionLine(val src: String): DescriptionLine {
-
-}
+class ImageDescriptionLine(val src: String) : DescriptionLine

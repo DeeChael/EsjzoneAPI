@@ -5,7 +5,7 @@ import retrofit2.Converter
 import retrofit2.Retrofit
 import java.lang.reflect.Type
 
-class CommentFactory: Converter.Factory(), Converter<Comment, String> {
+class CommentFactory : Converter.Factory(), Converter<Comment, String> {
 
     override fun convert(value: Comment): String {
         return "${value.id}-${value.senderId}"
