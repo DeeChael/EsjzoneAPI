@@ -162,7 +162,7 @@ class Novel(private val client: EsjzoneClient, val id: String, val name: String,
         val document = this.client.service.getNovelDetail(this.id).execute().body()!!
         for (commentElement in Xsoup.select(
             document,
-            "/html/body/div[3]/section/div/div[1]/section[39]/div[1]"
+            "/html/body/div[3]/section/div/div/section/div"
         ).elements) {
             val id = commentElement.attr("id").substring(8)
             val senderId = commentElement.getElementById("comment-author-ava")!!.getElementsByTag("a")[0].attr("href")

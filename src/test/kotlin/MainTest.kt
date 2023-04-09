@@ -31,7 +31,10 @@ class MainTest {
     @Test
     fun test() {
         val novel = Novel(this.client, "1678715616", "")
-        novel.comment("支持一下！")
+        for (comment in novel.listComments()) {
+            println("${comment.senderId} - ${comment.content}")
+        }
+        // novel.comment("支持一下！")
         // val comment = MeComment(this.client, novel, null, "1098400", 89573, "")
         // comment.delete()
     }

@@ -29,9 +29,9 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
             .cookieJar(object : CookieJar {
                 override fun loadForRequest(url: HttpUrl): List<Cookie> {
                     return listOf(
-                        Cookie.Builder().domain("www.esjzone.cc").name("ws_key").value(wsKey)
+                        Cookie.Builder().domain("www.esjzone.cc").name("ews_key").value(wsKey)
                             .build(),
-                        Cookie.Builder().domain("www.esjzone.cc").name("ws_token").value(wsToken)
+                        Cookie.Builder().domain("www.esjzone.cc").name("ews_token").value(wsToken)
                             .build()
                     )
                 }
@@ -54,7 +54,6 @@ class EsjzoneClient internal constructor(wsKey: String, wsToken: String, proxy: 
         val response = this.service.getAuthToken(url, BodyBuilder.of().param("plxf", "getAuthToken").build()).execute()
         val document = response.body()!!
         val text = document.getElementsByTag("JinJing")[0].text()
-        println(text)
         return text
     }
 

@@ -54,25 +54,25 @@ interface EsjzoneService {
     fun getMySystemMessages(): Call<Document>
 
     @GET("detail/{bookId}.html")
-    fun getNovelDetail(@Path("bookId") bookId: String): Call<Document>
+    fun getNovelDetail(@Path("bookId", encoded = true) bookId: String): Call<Document>
 
     @GET("forum/{bookId}/{chapterId}.html")
-    fun getChapterDetail(@Path("bookId") bookId: String, @Path("chapterId") chapterId: String): Call<Document>
+    fun getChapterDetail(@Path("bookId", encoded = true) bookId: String, @Path("chapterId", encoded = true) chapterId: String): Call<Document>
 
     @GET("forum")
     fun getCategories(): Call<Document>
 
     @GET("forum/{categoryId}/")
-    fun getCategoryNovels(@Path("categoryId") categoryId: String): Call<Document>
+    fun getCategoryNovels(@Path("categoryId", encoded = true) categoryId: String): Call<Document>
 
     @GET("tags{typeId}{sortId}/")
-    fun getNovelsByTag(@Path("typeId") typeId: Int, @Path("sortId") sortId: Int): Call<Document>
+    fun getNovelsByTag(@Path("typeId", encoded = true) typeId: Int, @Path("sortId", encoded = true) sortId: Int): Call<Document>
 
     @GET("tags{typeId}{sortId}/{tag}/")
     fun getNovelsByTag(
-        @Path("typeId") typeId: Int,
-        @Path("sortId") sortId: Int,
-        @Path("tag") tag: String
+        @Path("typeId", encoded = true) typeId: Int,
+        @Path("sortId", encoded = true) sortId: Int,
+        @Path("tag", encoded = true) tag: String
     ): Call<Document>
 
     @FormUrlEncoded
@@ -80,8 +80,8 @@ interface EsjzoneService {
     // fun createComment(@Part("content") content: String, @Part("data") data: String = "books")
     fun createComment(
         @Header("authorization") authToken: String,
-        @Field("content") content: String,
-        @Field("data") data: String = "books"
+        @Field("content", encoded = true) content: String,
+        @Field("data", encoded = true) data: String = "books"
     ): Call<ResponseBody>
 
     @FormUrlEncoded
@@ -89,9 +89,9 @@ interface EsjzoneService {
     // FIXME not works
     fun createChapterComment(
         @Header("authorization") authToken: String,
-        @Field("content") content: String,
-        @Field("forumId") chapterId: String,
-        @Part("Field") data: String = "forum"
+        @Field("content", encoded = true) content: String,
+        @Field("forumId", encoded = true) chapterId: String,
+        @Field("data", encoded = true) data: String = "forum"
     ): Call<ResponseBody>
     // fun createComment(@Body body: RequestBody, @Header("authorization") authToken: String): Call<ResponseBody>
 
@@ -100,10 +100,10 @@ interface EsjzoneService {
     // FIXME not works
     fun replyComment(
         @Header("authorization") authToken: String,
-        @Field("content") content: String,
-        @Field("reply") reply: String,
-        @Field("forum_id") forumId: String = "0",
-        @Field("data") data: String = "books"
+        @Field("content", encoded = true) content: String,
+        @Field("reply", encoded = true) reply: String,
+        @Field("forum_id", encoded = true) forumId: String = "0",
+        @Field("data", encoded = true) data: String = "books"
     ): Call<ResponseBody>
     // fun replyComment(@Body body: RequestBody, @Header("authorization") authToken: String): Call<ResponseBody>
 
@@ -112,9 +112,9 @@ interface EsjzoneService {
     // FIXME not works
     fun deleteComment(
         @Header("authorization") authToken: String,
-        @Field("rid") commentId: String,
-        @Field("type") type: String = "book",
-        @Field("data") data: String = "books"
+        @Field("rid", encoded = true) commentId: String,
+        @Field("type", encoded = true) type: String = "book",
+        @Field("data", encoded = true) data: String = "books"
     ): Call<ResponseBody>
     // fun deleteComment(@Body body: RequestBody, @Header("authorization") authToken: String): Call<ResponseBody>
 
